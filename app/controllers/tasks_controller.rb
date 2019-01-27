@@ -1,16 +1,39 @@
 class TasksController < ApplicationController
   before_action :require_user_logged_in
-  before_action :correct_user, only: [:destroy]
+  before_action :correct_user, only: [:show, :edit, :update, :destroy]
 
+  def index
+    @tasks = current_user.tasks.page(params[:page])
+  end
+  
+  def show
+  end
+
+  def new
+    @task = Task.new
+  end
+  
   def create
     @task = current_user.tasks.build(task_params)
     if @task.save
       flash[:success] = 'Taskを登録しました。'
-      redirect_to root_url
+      redirect_to @task
     else
-      @tasks = current_user.tasks.order('created_at DESC').page(params[:page])
       flash.now[:danger] = 'Taskの登録に失敗しました。'
-      render 'toppages/index'
+      render :new
+    end
+  end
+
+  def edit
+  end
+  
+  def update
+    if @task.update(task_params)
+      flash[:success] = 'Taskを編集しました。'
+      redirect_to @task
+    else
+      flash.now[:danger] = 'Taskの登録に失敗しました。'
+      render :edit
     end
   end
 
